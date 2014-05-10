@@ -1,10 +1,5 @@
 # cache for current jar dependency. DO NOT EDIT.
 # format is <lastModified> <length> <SHA-1> <path>
 # Encoding is UTF-8
-<<<<<<< HEAD
-1399683122079 627582 cb6883d96005bc85b3e868f204507ea5b4fa9bbf C:\Users\Smitty\androidworkplace\appcompat_v7\libs\android-support-v4.jar
+1399682936795 627582 cb6883d96005bc85b3e868f204507ea5b4fa9bbf C:\Users\Smitty\workspace\androidworkplace\appcompat_v7\libs\android-support-v4.jar
 1399683122079 627582 cb6883d96005bc85b3e868f204507ea5b4fa9bbf C:\Users\Smitty\git\Steam-Trading-App\libs\android-support-v4.jar
-=======
-1389974490000 627582 cb6883d96005bc85b3e868f204507ea5b4fa9bbf /Users/jordanporter/Documents/Andoir Development/Android Workspace/appcompat_v7/libs/android-support-v4.jar
-1399681806000 627582 cb6883d96005bc85b3e868f204507ea5b4fa9bbf /Users/jordanporter/Documents/Andoir Development/Steam Market App/Steam App/libs/android-support-v4.jar
->>>>>>> 7a7ac2ae8261939fcafa1412cd03dcb8c2c8f79b
