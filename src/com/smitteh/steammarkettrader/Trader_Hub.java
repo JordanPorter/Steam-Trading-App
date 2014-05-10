@@ -8,7 +8,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-
+// Jordan
 public class Trader_Hub extends ActionBarActivity {
 
 	@Override
