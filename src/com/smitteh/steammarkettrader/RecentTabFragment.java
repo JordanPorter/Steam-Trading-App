@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import com.smitteh.apis.Steam;
+import com.smitteh.struts.SteamInventoryItem;
+
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -40,7 +43,7 @@ public class RecentTabFragment extends Fragment {
 	// TODO: Rename and change types of parameters
 	private String mParam1;
 	private String mParam2;
-
+	List<SteamInventoryItem> inventoryItems = new ArrayList<SteamInventoryItem>();
 	private OnFragmentInteractionListener mListener;
 
 	/**
@@ -70,6 +73,7 @@ public class RecentTabFragment extends Fragment {
 			mParam1 = getArguments().getString(ARG_PARAM1);
 			mParam2 = getArguments().getString(ARG_PARAM2);
 		}
+		
 	}
 
 	@Override
@@ -84,24 +88,28 @@ public class RecentTabFragment extends Fragment {
 		ListView listView = (ListView) view.findViewById(R.id.itemList);
 
 		// Add Items to List
-		String[] items = { "AK-47 | Redline", "AK-47 | Redline" , "AK-47 | Redline" , "AK-47 | Redline" , "AK-47 | Redline" , "AK-47 | Redline" , "AK-47 | Redline" , "AK-47 | Redline" , "AK-47 | Redline" , "AK-47 | Redline" , "AK-47 | Redline" , "AK-47 | Redline" , "AK-47 | Redline" , "AK-47 | Redline" , "AK-47 | Redline" , "AK-47 | Redline" , "AK-47 | Redline" , "AK-47 | Redline" };
+		//String[] items = { "AK-47 | Redline", "AK-47 | Redline" , "AK-47 | Redline" , "AK-47 | Redline" , "AK-47 | Redline" , "AK-47 | Redline" , "AK-47 | Redline" , "AK-47 | Redline" , "AK-47 | Redline" , "AK-47 | Redline" , "AK-47 | Redline" , "AK-47 | Redline" , "AK-47 | Redline" , "AK-47 | Redline" , "AK-47 | Redline" , "AK-47 | Redline" , "AK-47 | Redline" , "AK-47 | Redline" };
 		final ArrayList<String> list = new ArrayList<String>();
-		for (int i = 0; i < items.length; ++i) {
-			list.add(items[i]);
+		//inventoryItems = Steam.getInventory("76561198128825604", 730, 2);
+		for (int i = 0; i < inventoryItems.size(); ++i) {
+			list.add(inventoryItems.get(i).getName());
 		}
+		
+
 
 		// Set View Adapter Can Customize
 		final StableArrayAdapter adapter = new StableArrayAdapter(
 				getActivity(), android.R.layout.simple_list_item_1, list);
 		listView.setAdapter(adapter);
-
+		
+		new DownloadInventoryTask(inventoryItems, adapter).execute("");
 		// Event Listeners
 		listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
 			@Override
 			public void onItemClick(AdapterView<?> parent, final View view,
 					int position, long id) {
-				System.out.println(list.get(position));
+				System.out.println(inventoryItems.get(position).getName());
 			}
 
 		});
@@ -159,6 +167,14 @@ public class RecentTabFragment extends Fragment {
 		}
 
 		@Override
+		public void add(String object){
+			super.add(object);
+			for (int i = 0; i < list.size(); ++i) {
+				mIdMap.put(list.get(i), i);
+			}
+		}
+		
+		@Override
 		public long getItemId(int position) {
 			String item = getItem(position);
 			return mIdMap.get(item);
@@ -174,10 +190,10 @@ public class RecentTabFragment extends Fragment {
 			
 			ImageView imageView = (ImageView) rowView.findViewById(R.id.icon);
 			
-			new DownloadImageTask(imageView).execute("http://cdn.steamcommunity.com/economy/image/L4unpKkvRlEe8V165UkaO5fHbRXtX0gRyj-OYAGvUpzmgJBf8DMAQ74oQYTDKUa1j8A2UuRASBXMNIlyALlFlunChFXhNwdKrllFjsBjVaSL1n1KoBUGDMA1uGBE6BGm5Ji_UexiRXm5aUCZz1lKoJvabAiIHAYOyD7JME7tHsqxjtMAt2JGFb4yFtyZPkGhnIUqVLYUBUmZOYUzHO5AweOOgh73OBU=/128fx128f");
+			new DownloadImageTask(imageView).execute("http://cdn.steamcommunity.com/economy/image/" + inventoryItems.get(position).getIconURLLarge() + "/128fx128f");
 		
 
-			itemName.setText(list.get(position));
+			itemName.setText(inventoryItems.get(position).getName());
 			username.setText("Jordan");
 			// Change the icon for Windows and iPhone
 			return rowView;
@@ -191,6 +207,43 @@ public class RecentTabFragment extends Fragment {
 	}
 
 }
+
+class DownloadInventoryTask extends AsyncTask<String, Void, List<SteamInventoryItem>> {
+	List<SteamInventoryItem> list = new ArrayList<SteamInventoryItem>();
+	ArrayAdapter<String> adapter;
+	
+	public DownloadInventoryTask(List<SteamInventoryItem> list, ArrayAdapter<String> adapter) {
+		this.list = list;
+		this.adapter = adapter;
+	}
+
+	protected List<SteamInventoryItem> doInBackground(String... urls) {
+		String urldisplay = urls[0];
+		List<SteamInventoryItem> list = null;
+		try {
+			list = Steam.getInventory("76561198128825604", 730, 2);
+		} catch (Exception e) {
+			Log.e("Error", e.getMessage());
+			e.printStackTrace();
+		}
+		return list;
+	}
+
+	protected void onPostExecute(List<SteamInventoryItem> result) {
+		if(result != null){
+			list.addAll(result);
+			System.err.println(list.size());
+			ArrayList<String> items = new ArrayList<String>();
+			for(SteamInventoryItem item : list)
+				adapter.add(item.getName());
+			
+			//adapter.addAll(items);
+			adapter.notifyDataSetChanged();
+			
+		}
+	}
+}
+
 
 class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
 	ImageView bmImage;
